@@ -3,7 +3,6 @@ package crawler
 import (
 	"net/http"
 
-	"strconv"
 	"strings"
 	"sync"
 
@@ -89,13 +88,20 @@ func (c *Crawler) work(wg *sync.WaitGroup, rootUrl string, depth int) {
 			if strings.HasPrefix(url, c.domainUrl) {
 				if !c.urlCache.Has(url) {
 					c.urlCache.Add(url)
-					c.l.Info("URL: " + url + "; Depth: " + strconv.Itoa(c.depth-depth+1))
 					wg.Add(1)
 					go c.work(wg, url, depth-1)
 				}
 			}
 		}
 	}
+}
+
+func (c *Crawler) GetResults() []string {
+	var result []string
+	for URL, _ := range c.urlCache.FetchAll() {
+		result = append(result, URL)
+	}
+	return result
 }
 
 func (c *Crawler) Run() error {
@@ -107,7 +113,7 @@ func (c *Crawler) Run() error {
 	c.wg.Add(1)
 	c.work(c.wg, c.domainUrl, c.depth)
 	c.wg.Wait()
-	c.l.Info("Done")
+	c.l.Info("done")
 	c.l.Info("results", zap.Any("r", c.urlCache.FetchAll()))
 	return nil
 }
