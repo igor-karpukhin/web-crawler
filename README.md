@@ -1,5 +1,4 @@
 # web-crawler
-<<<<<<< HEAD
 ###Description
 Tool to get web-site links tree
 
