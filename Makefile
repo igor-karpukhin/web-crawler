@@ -11,17 +11,24 @@ LDFLAGS := -s -w -X '${PACKAGE}/version.Version=${VERSION}' \
 
 .PHONY: clean build test all
 
-all: clean build test
+all: get clean build test coverage
 
 build:
 	CGO_ENABLED=0 GOOS=linux go build -ldflags "${LDFLAGS}" -a -o bin/${SERVICE}
 
 build_osx:
 	CGO_ENABLED=0 GOOGS=darwin go build -ldflags "${LDFLAGS}" -a -o bin/${SERVICE}
-
 test:
-	go test ./...
+	cd ${GOPATH}/src/${PACKAGE} ; ./scripts/test.sh ${verbose}
+	go tool cover -func=coverage.out | tail -n 1
+	go2xunit -input test-result.out -output tests.xml
+
+coverage: test
+	go tool cover -html=coverage.out -o out.html && open out.html
+
+get:
+	go get github.com/tebeka/go2xunit
 
 clean:
-	rm -rf *.test
+	rm -rf *.test *.html *.xml *.out
 	rm -rf bin/
