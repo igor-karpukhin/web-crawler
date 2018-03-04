@@ -38,8 +38,14 @@ func (t *URLTree) Append(urls []string) {
 	}
 }
 
-func (t *URLTree) ToJSON() (string, error) {
-	r, err := json.MarshalIndent(t, "", "  ")
+func (t *URLTree) ToJSON(pretty bool) (string, error) {
+	var r []byte
+	var err error
+	if pretty {
+		r, err = json.MarshalIndent(t, "", "  ")
+	} else {
+		r, err = json.Marshal(t)
+	}
 	if err != nil {
 		return "", err
 	}

@@ -35,5 +35,5 @@ func BuildJSONMap(domain string, urls []string) (string, error) {
 		}
 		tree.Append(strings.Split(u.Host+u.Path, "/"))
 	}
-	return tree.ToJSON()
+	return tree.ToJSON(true)
 }
