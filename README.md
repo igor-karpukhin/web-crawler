@@ -1,7 +1,8 @@
 # web-crawler
+<<<<<<< HEAD
 ###Description
 Tool to get web-site links tree
 
 ###Build
-`make build`
-
+***MacOS*** `make build_osx`
+***Linux*** `make build`
