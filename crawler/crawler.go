@@ -1,11 +1,10 @@
 package crawler
 
 import (
-	"net/http"
-
 	"strings"
 	"sync"
 
+	"github.com/igor-karpukhin/web-crawler/dataprovider"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"golang.org/x/net/html"
@@ -18,6 +17,7 @@ type Crawler struct {
 	depth     int
 	l         *zap.Logger
 	wg        *sync.WaitGroup
+	provider  dataprovider.DataProvider
 }
 
 func HasHref(token html.Token) (bool, string) {
@@ -34,8 +34,10 @@ func HasHref(token html.Token) (bool, string) {
 	return found, url
 }
 
-func NewCrawler(domainUrl string, depth int, logger *zap.Logger) *Crawler {
+func NewCrawler(provider dataprovider.DataProvider, domainUrl string,
+	depth int, logger *zap.Logger) *Crawler {
 	return &Crawler{
+		provider:  provider,
 		urlCache:  NewURLCache(),
 		domainUrl: domainUrl,
 		depth:     depth,
@@ -50,16 +52,12 @@ func (c *Crawler) work(wg *sync.WaitGroup, rootUrl string, depth int) {
 		return
 	}
 
-	resp, err := http.Get(rootUrl)
+	resp, err := c.provider.Fetch(rootUrl)
 	if err != nil {
 		return
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return
-	}
 
-	root := html.NewTokenizer(resp.Body)
+	root := html.NewTokenizer(resp)
 	for {
 		token := root.Next()
 		switch {
@@ -114,6 +112,6 @@ func (c *Crawler) Run() error {
 	c.work(c.wg, c.domainUrl, c.depth)
 	c.wg.Wait()
 	c.l.Info("done")
-	c.l.Info("results", zap.Any("r", c.urlCache.FetchAll()))
+	c.l.Debug("results", zap.Any("r", c.urlCache.FetchAll()))
 	return nil
 }

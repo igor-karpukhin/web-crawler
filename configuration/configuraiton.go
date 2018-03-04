@@ -6,8 +6,10 @@ import (
 )
 
 type ApplicationConfiguration struct {
-	TargetURL string
-	Depth     int
+	TargetURL  string
+	Depth      int
+	Version    bool
+	OutputFile string
 }
 
 func (a *ApplicationConfiguration) Init() {
@@ -17,6 +19,8 @@ func (a *ApplicationConfiguration) Init() {
 
 	flag.StringVar(&a.TargetURL, "target", "", "target web site to crawl")
 	flag.IntVar(&a.Depth, "depth", 1, "fetching depth")
+	flag.BoolVar(&a.Version, "v", false, "print version and exit application")
+	flag.StringVar(&a.OutputFile, "o", "", "output file for site tree")
 
 	flag.Parse()
 
