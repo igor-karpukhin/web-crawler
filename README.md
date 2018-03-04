@@ -3,6 +3,6 @@
 Tool to get web-site links tree
 
 ### Build
-***MacOS***: `make build_osx`
+***MacOS***: `make get && make build_osx && make coverage`
 
-***Linux***: `make build`
+***Linux***: `make all`
