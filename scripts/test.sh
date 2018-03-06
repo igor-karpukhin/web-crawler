@@ -11,7 +11,7 @@ else
         VERBOSE=""
 fi
 
-for d in $(go list ./... | grep -v /vendor/ | grep -v /offerbiddingservrpc ); do
+for d in $(go list ./... | grep -v /vendor/); do
     COVER_PKG=$d
 
         go test $VERBOSE --race -coverprofile=profile.out -coverpkg=$COVER_PKG -covermode=atomic $d | tee result.out
